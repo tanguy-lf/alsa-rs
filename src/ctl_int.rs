@@ -84,6 +84,16 @@ impl Ctl {
         let e = event_new()?;
         acheck!(snd_ctl_read(self.0, e.0)).map(|r| if r == 1 { Some(e) } else { None })
     }
+
+    pub fn pcm_info(&self, info: &mut crate::pcm::Info) -> Result<()> {
+        acheck!(snd_ctl_pcm_info(self.0, info.raw())).map(|_| ())
+    }
+
+    pub fn pcm_next_device(&self, dev: i32) -> Result<i32> {
+        let mut dev: c_int = dev;
+        acheck!(snd_ctl_pcm_next_device(self.0, &mut dev)).map(|_| dev as i32)
+    }
+    
 }
 
 impl Drop for Ctl {
@@ -134,6 +144,7 @@ impl CardInfo {
     pub fn get_mixername(&self) -> Result<&str> {
         from_const("snd_ctl_card_info_get_mixername", unsafe { alsa::snd_ctl_card_info_get_mixername(self.0) })}
     pub fn get_card(&self) -> Card { Card::new(unsafe { alsa::snd_ctl_card_info_get_card(self.0) })}
+    //pub fn get_subdevices_count(&self) -> c_uint { unsafe { alsa::snd_pcm_info_get_subdevices_count(self.0) }}
 }
 
 alsa_enum!(

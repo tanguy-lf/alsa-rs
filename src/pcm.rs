@@ -73,8 +73,16 @@ impl Info {
         unsafe { alsa::snd_pcm_info_get_device(self.0) }
     }
 
+    pub fn set_device(&self, device: u32) -> () {
+        unsafe { alsa::snd_pcm_info_set_device(self.0, device) }
+    }
+
     pub fn get_subdevice(&self) -> u32 {
         unsafe { alsa::snd_pcm_info_get_subdevice(self.0) }
+    }
+
+    pub fn set_subdevice(&self, subdevice: u32) -> () {
+        unsafe { alsa::snd_pcm_info_set_subdevice(self.0, subdevice) }
     }
 
     pub fn get_id(&self) -> Result<&str> {
@@ -98,6 +106,21 @@ impl Info {
             alsa::SND_PCM_STREAM_PLAYBACK => Direction::Playback,
             n @ _ => panic!("snd_pcm_info_get_stream invalid direction '{}'", n),
         }
+    }
+
+    pub fn set_stream(&self, stream: Direction) -> () {
+        unsafe { alsa::snd_pcm_info_set_stream(self.0, match stream {
+            Direction::Playback => alsa::SND_PCM_STREAM_PLAYBACK,
+            Direction::Capture => alsa::SND_PCM_STREAM_CAPTURE,
+        }) }
+    }
+
+    pub fn get_subdevices_count(&self) -> u32 {
+        unsafe { alsa::snd_pcm_info_get_subdevices_count(self.0) }
+    }
+
+    pub fn raw(&self)-> *mut alsa::_snd_pcm_info{
+        self.0
     }
 }
 
